@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}
+Aahho | Payment
+{% endblock %}
+{% block content %}
+  {% if messages %}
+    <br>
+    {% for message in messages %}
+    <div {% if message.tags == 'error' %} class="danger-alert"
+        {% elif message.tags == 'success' %} class="success-alert"
+        {% endif %}>
+      <center>{{ message }}</center>
+    </div>
+    {% endfor %}
+  {% endif %}
+  <div class="container" style="margin-top: 6%;">
+    <label style="font-size: 22px;color: #650808;"> Checkout </label>
+    <label class="pull-right" style="font-size: 13px;color: #fdfbfb;background-color: cornflowerblue;padding: 10px;">Email : {{data.email}}</label>
+    <div style="background-color: #f7fdeb;margin-left: 0px;margin-right: 600px;padding: 10px;">
+      <form action="/payment/charge?secure_key={{pass_key}}" method="POST" id="payment-form">
+        {% csrf_token %}
+        <label for="card-element">
+          Credit or debit card
+        </label>
+        <div id="card-element">
+          <!-- a Stripe Element will be inserted here. -->
+        </div>
+        <div id="card-errors" role="alert">
+        <!-- Used to display Element errors -->
+        </div>
+        <div class="row" style="margin-right: 5px; margin-top: 5px;">
+          <div class="text-right">
+            <button type="submit" name="btnSubmit" class="btn btn-sm btn-success">Save &amp; Proceed</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div>
+    {% if data.cards|length > 0 %}
+    <hr>
+    <label class="pull-right" style="font-size: 13px;color: #fdfbfb;background-color: cornflowerblue;padding: 10px; margin-top: 15px;">Pay Amount</label>
+      <div style="margin-left: 0px;margin-right: 500px;padding: 10px;">
+        <label style="font-size: 15px;color: #650808;"> Saved Card Details </label>
+        <table class="table table-hover" style="font-size: 12px;background-color: #f7fdeb;">
+          <thead>
+            <tr>
+              <td>Select</td>
+              <th>Name</th>
+              <th>Card<small>Ends With</small></th>
+              <th>Brand</th>
+              <th>MM/YYYY</th>
+              <th>Zip</th>
+            </tr>
+          </thead>
+          {% for card in data.cards %}
+            <tr>
+              <td>
+              <form action="/payment/charge?secure_key={{pass_key}}&is_fromsaved=True" method="POST" id="saved-card">
+                <input type="button" class="payment-btn btn btn-primary" value="Pay">
+                <input type="hidden" name="id" value="{{card.id}}">
+                <input type="hidden" name="email" value="{{card.email}}">
+              </form>
+              </td>
+              <td>{% if card.customer_name != None %}{{card.customer_name}}{% endif %} {{data.email}}</td>
+              <td>{{card.digits}}</td>
+              <td>{{card.card_brand}}</td>
+              <td>{{card.exp_month}}/{{card.exp_year}}</td>
+              <td>{{card.zip_code}}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endif %}
+    </div>
+  </div>
+{% endblock %}
