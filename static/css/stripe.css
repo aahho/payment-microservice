@@ -1,64 +1,170 @@
-.navbar{
-    height: 70px;
-    background-color: #2196F3;
+* {
+  font-family: 'Helvetica Neue', Helvetica, sans-serif;
+  font-size: 19px;
+  font-variant: normal;
+  padding: 0;
+  margin: 0;
 }
-.navbar-brand{
-    color:#fff !important;
-    margin: 0px;
-    font-size: 25px;
-    font-weight: 600;
+
+html, html a{
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
 }
-.top-space{
-    margin-top:90px;
+
+body {
+  display: flex;
+  align-items: center;
+  min-height: 100%;
+  background-color: #3a3863;
 }
-.card{
-    padding:0px;
+
+.checkout-form {
+  width: 480px;
+  margin: 20px auto;
 }
-.card-block{
-    padding:10px;
+
+label {
+  height: 35px;
+  position: relative;
+  color: #8798AB;
+  display: block;
+  margin-top: 30px;
+  margin-bottom: 20px;
 }
-.no-margin{
-    margin:0px;
+
+.top-navbar {
+  /*position: relative;*/
+  font-size: 13px;
+  color: white;
+  margin-top: -12px;
+  display: block;
 }
-.no-padding{
-    padding:0px;
+
+label > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-weight: 300;
+  line-height: 32px;
+  color: #8798AB;
+  border-bottom: 1px solid #586A82;
+  transition: border-bottom-color 200ms ease-in-out;
+  cursor: text;
+  pointer-events: none;
 }
-.list-group-item{
-    padding: 0.5rem 0 0.5rem 0.5rem;
-    font-size: 15px;
-    cursor: pointer;
+
+label > span span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0% 50%;
+  transition: transform 200ms ease-in-out;
+  cursor: text;
 }
-.list-group-item:hover{
-    background-color: #dcdcdc;
+
+label .field.is-focused + span span,
+label .field:not(.is-empty) + span span {
+  transform: scale(0.68) translateY(-36px);
+  cursor: default;
 }
-.card-title{
-    border-bottom:1px solid #dcdcdc;                    
-    padding:0.35rem 0 0.4rem 0;
-    margin: 0px;
+
+label .field.is-focused + span {
+  border-bottom-color: #34D08C;
 }
-.icon-style{
-    font-size: 24px;
-    color: rgb(33, 150, 243);
+
+.field {
+  background: transparent;
+  font-weight: 300;
+  border: 0;
+  color: white;
+  outline: none;
+  cursor: text;
+  display: block;
+  width: 100%;
+  line-height: 32px;
+  padding-bottom: 3px;
+  transition: opacity 200ms ease-in-out;
 }
-.form-block{
-    padding: 20px;
+
+.field::-webkit-input-placeholder { color: #8898AA; }
+.field::-moz-placeholder { color: #8898AA; }
+
+/* IE doesn't show placeholders when empty+focused */
+ .field:-ms-input-placeholder { color: #424770; }
+
+.field.is-empty:not(.is-focused) {
+  opacity: 0;
 }
-.form-margin{
-    margin:20px 0px 0px 0px;
+
+.checkout_button {
+  float: left;
+  display: block;
+  background: #34D08C;
+  color: white;
+  border-radius: 2px;
+  border: 0;
+  margin-top: 20px;
+  font-size: 19px;
+  font-weight: 400;
+  width: 100%;
+  height: 47px;
+  line-height: 45px;
+  outline: none;
 }
-.input-group ,.form-check{
-    padding:0px;
+
+.pay_button {
+  float: left;
+  display: block;
+  background: #34D08C;
+  color: white;
+  border-radius: 2px;
+  border: 0;
+  margin-top:1px;
+  font-size: 19px;
+  font-weight: 400;
+  width: 100%;
+  height: 35px;
+  line-height: 35px;
+  outline: none;
 }
-.form-secured-msg{
-    padding: 5px 0px;
-    background: rgba(220, 220, 220, 0.48);
+
+button:focus {
+  background: #24B47E;
 }
-.active-tab{
-    background-color: rgba(0, 188, 212, 0.18);
+
+button:active {
+  background: #159570;
 }
-.hidden{
-    display: none;
+
+.outcome {
+  float: left;
+  width: 100%;
+  padding-top: 8px;
+  min-height: 20px;
+  text-align: center;
 }
-.show{
-    display: block;
+
+.success, .error {
+  display: none;
+  font-size: 15px;
+}
+
+.success.visible, .error.visible {
+  display: inline;
+}
+
+.error {
+  color: #E4584C;
+}
+
+.success {
+  color: #34D08C;
+}
+
+.success .token {
+  font-weight: 500;
+  font-size: 15px;
 }

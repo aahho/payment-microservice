@@ -45,8 +45,8 @@ class StripeApis():
 			body = e.json_body
   			err  = body.get('error', {})
 			return Controller.respondWithError(e.http_status, err.get('message'), 'Error From Api. Api Error!')
-		# except Exception as e:
-		# 	return Controller.respondWithError(500, 'We messed up!', 'Something Went Wrong')
+		except Exception as e:
+			return Controller.respondWithError(500, 'We messed up!', 'Something Went Wrong')
 
 	def fetch_customer(self, request):
 		payment_details = PaymentRequest.request_manager.validate(request.GET['secure_key'])
@@ -107,26 +107,26 @@ class StripeApis():
 	def find_or_create_customer(self, request, token):
 		customer = Customers.customer_manager.get_by_keys({'email':token.email})
 		if len(customer):
-			customer_details = stripe.Customer.retrieve(customer[0].customer_id).sources.create(card=request.POST.get('stripeToken', ''))
-			customer_afterupdate = stripe.Customer.retrieve(customer[0].customer_id)
-			
-			## VALIDATING AND DELETING CARDS
-			card_fingerprints = []
-			for card in customer_afterupdate['sources']['data']:
-				if card.fingerprint not in card_fingerprints:
-					card_fingerprints.append(card.fingerprint)
-				else:
-					customer_afterupdate.sources.retrieve(card.id).delete()
-			
-			## UPDATING LOCAL DATABASE WITH CUSTOMER NEW CARD DATA
-			customer[0].extras = stripe.Customer.retrieve(customer[0].customer_id)
-			customer[0].save()
+			if 'secure_save' in request.POST and request.POST.get('secure_save') == 'on':
+				customer_details = stripe.Customer.retrieve(customer[0].customer_id).sources.create(card=request.POST.get('stripeToken', ''))
+				customer_afterupdate = stripe.Customer.retrieve(customer[0].customer_id)
+				
+				## VALIDATING AND DELETING CARDS
+				card_fingerprints = []
+				for card in customer_afterupdate['sources']['data']:
+					if card.fingerprint not in card_fingerprints:
+						card_fingerprints.append(card.fingerprint)
+					else:
+						customer_afterupdate.sources.retrieve(card.id).delete()
+				
+				## UPDATING LOCAL DATABASE WITH CUSTOMER NEW CARD DATA
+				customer[0].extras = stripe.Customer.retrieve(customer[0].customer_id)
+				customer[0].save()
 			return customer[0]
 		else:
 			customer = stripe.Customer.create(
 				card = request.POST.get('stripeToken', ''),
-	            email = token.email,
-	            description = 'Some Description Goes Here'
+	            email = token.email
 			)
 			new = format_data.store_customer(customer)
 			customer = Customers(**new).save()
@@ -149,18 +149,23 @@ class StripeApis():
 						return Controller.respondWithError(500, 'Transaction Failed', 'Invalid Card Provided')
 					charge = stripe.Charge.create(
 						amount = token[0].amount,
-						currency = 'usd',
+						currency = 'INR',
 						customer = str(customer[0].customer_id),
-						card = str(request.POST.get('id'))
+						card = str(request.POST.get('id')),
+						idempotency_key = str(helper.generate_uuid())
 					)
 				else:
 					customer = self.find_or_create_customer(request, token[0])
 					charge = stripe.Charge.create(
 						amount = token[0].amount,
-						currency = "usd",
-						source = "tok_amex", # obtained with Stripe.js
+						currency = "INR",
+						customer = customer.customer_id,
 						description = "Charge for "+customer.email,
-						idempotency_key = str(helper.generate_uuid())
+						idempotency_key = str(helper.generate_uuid()),
+						metadata = {
+							'display_name' : request.POST['cardholder-name'],
+							'phone_number' : request.POST['phone-number']
+						}
 					)
 				if charge:
 					PaymentRequest.request_manager.expire_token(request.GET['secure_key'])

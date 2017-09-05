@@ -18,7 +18,7 @@ from django.contrib import admin
 from stripe_service import payment
 
 urlpatterns = [
-    # url(r'^admin/', admin.site.urls),
+    url(r'^$', payment.start),
     url(r'^payment/initiate', payment.initiate_payment),
     url(r'^payment/charge', payment.create_payment),
     url(r'^start', payment.start),

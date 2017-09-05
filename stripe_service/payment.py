@@ -18,6 +18,8 @@ def initiate_payment(request):
 
 def create_payment(request):
 	if request.method == 'GET':
+		if 'secure_key' not in request.GET:
+			return Controller.respondWithError(400, 'Parameters Mismatched', 'Bad Request')
 		pass_key = request.GET['secure_key']
 		data = apis.handle('fetch_customer', request)
 		if 'email' in  data:

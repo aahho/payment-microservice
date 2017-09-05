@@ -13,64 +13,67 @@ Aahho | Payment
     </div>
     {% endfor %}
   {% endif %}
-  <div class="container" style="margin-top: 6%;">
-    <label style="font-size: 22px;color: #650808;"> Checkout </label>
-    <label class="pull-right" style="font-size: 13px;color: #fdfbfb;background-color: cornflowerblue;padding: 10px;">Email : {{data.email}}</label>
-    <div style="background-color: #f7fdeb;margin-left: 0px;margin-right: 600px;padding: 10px;">
-      <form action="/payment/charge?secure_key={{pass_key}}" method="POST" id="payment-form">
-        {% csrf_token %}
-        <label for="card-element">
-          Credit or debit card
-        </label>
-        <div id="card-element">
-          <!-- a Stripe Element will be inserted here. -->
+  <div class="container">
+    <div class="row top-space">
+      <div class="card" style="padding: 15px;margin-left: 30px;margin-top: 20px;background-color: #424770;">
+        <div>
+          <form class="checkout-form" action="/payment/charge?secure_key={{pass_key}}" method="POST">
+            {% csrf_token %}
+            <label>
+              <input name="cardholder-name" class="field is-empty" placeholder="Ankur Mishra" />
+              <span><span>Name</span></span>
+            </label>
+            <label>
+              <input name="phone-number" class="field is-empty" type="tel" placeholder="(123) 456-7890" />
+              <span><span>Phone number</span></span>
+            </label>
+            <label>
+              <div id="card-element" class="field is-empty"></div>
+              <span><span>Credit or debit card</span></span>
+            </label>
+            <label>
+              <input type="checkbox" name="secure_save" style="margin-right:5px;" checked>
+              <small> Securely save this card for a faster checkout next time. </small>
+              <i class="fa fa-lock pull-right" style="margin:5px;"></i>
+            </label>
+            <button class="checkout_button" type="submit">Checkout</button>
+            <div class="outcome">
+              <div class="error" role="alert"></div>
+              <div class="success">
+                Success! Your Stripe token is <span class="token"></span>
+              </div>
+            </div>
+          </form>
         </div>
-        <div id="card-errors" role="alert">
-        <!-- Used to display Element errors -->
-        </div>
-        <div class="row" style="margin-right: 5px; margin-top: 5px;">
-          <div class="text-right">
-            <button type="submit" name="btnSubmit" class="btn btn-sm btn-success">Save &amp; Proceed</button>
-          </div>
-        </div>
-      </form>
-    </div>
-    <div>
-    {% if data.cards|length > 0 %}
-    <hr>
-    <label class="pull-right" style="font-size: 13px;color: #fdfbfb;background-color: cornflowerblue;padding: 10px; margin-top: 15px;">Pay Amount</label>
-      <div style="margin-left: 0px;margin-right: 500px;padding: 10px;">
-        <label style="font-size: 15px;color: #650808;"> Saved Card Details </label>
-        <table class="table table-hover" style="font-size: 12px;background-color: #f7fdeb;">
-          <thead>
-            <tr>
-              <td>Select</td>
-              <th>Name</th>
-              <th>Card<small>Ends With</small></th>
-              <th>Brand</th>
-              <th>MM/YYYY</th>
-              <th>Zip</th>
-            </tr>
-          </thead>
-          {% for card in data.cards %}
-            <tr>
-              <td>
-              <form action="/payment/charge?secure_key={{pass_key}}&is_fromsaved=True" method="POST" id="saved-card">
-                <input type="button" class="payment-btn btn btn-primary" value="Pay">
-                <input type="hidden" name="id" value="{{card.id}}">
-                <input type="hidden" name="email" value="{{card.email}}">
-              </form>
-              </td>
-              <td>{% if card.customer_name != None %}{{card.customer_name}}{% endif %} {{data.email}}</td>
-              <td>{{card.digits}}</td>
-              <td>{{card.card_brand}}</td>
-              <td>{{card.exp_month}}/{{card.exp_year}}</td>
-              <td>{{card.zip_code}}</td>
-            </tr>
-          {% endfor %}
-        </table>
       </div>
-    {% endif %}
+      <div class="card" style="width:45%; padding: 15px;margin-left: 30px;margin-top: 20px;">
+        {% if data.cards|length > 0 %}
+          <table class="table">
+            <thead class="thead-inverse">
+              <tr>
+                <th> Card No </th>
+                <th> Valid Till </th>
+                <th> Select </th>
+              </tr>
+            </thead>
+            {% for card in data.cards %}
+              <tbody>
+                <td> **** **** **** {{card.digits}} </td>
+                <td> {{card.exp_month}}/{{card.exp_year}} </td>
+                <td>
+                  <form action="/payment/charge?secure_key={{pass_key}}&is_fromsaved=True" method="POST">
+                    <button class="pay_button">pay</button>
+                    <input type="hidden" name="id" value="{{card.id}}">
+                    <input type="hidden" name="email" value="{{card.email}}">
+                  </form>
+                </td>
+              </tbody>
+            {% endfor %}
+          </table>
+        {% else %}
+          <p style="color: red;text-align: center;font-weight: 900;margin-top: 180px;"> No Saved Card Found! </p>
+        {% endif %}
+      </div>
     </div>
-  </div>
+</div>
 {% endblock %}

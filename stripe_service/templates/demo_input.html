@@ -5,6 +5,7 @@
 </head>
 <body>
   <form action="/payment/initiate" method="POST">
+  	{% csrf_token %}
     Amount : <input type="text" name="amount" required><br>
     Email : <input type="email" name="email" required><br>
     <input type="submit" name="submit" value="submit">

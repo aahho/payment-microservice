@@ -1,0 +1,7 @@
+.pyc
+*.pyc
+migrations
+env.py
+debug.log
+.DS_Store
+temp
